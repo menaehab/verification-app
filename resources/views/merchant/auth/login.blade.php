@@ -9,7 +9,7 @@
             <div class="card-body">
               <!-- Logo -->
               <div class="app-brand justify-content-center">
-                <a href="index.html" class="app-brand-link gap-2">
+                <a href="index.html" class="gap-2 app-brand-link">
                   <span class="app-brand-logo demo">
                     <svg
                       width="25"
@@ -72,22 +72,27 @@
               <h4 class="mb-2">Welcome to Sneat! 👋</h4>
               <p class="mb-4">Please sign-in to your account and start the adventure</p>
 
-              <form id="formAuthentication" class="mb-3" action="index.html" method="POST">
+              <form id="formAuthentication" class="mb-3" action="{{ route('merchant.login') }}" method="POST">
+                @csrf
                 <div class="mb-3">
-                  <label for="email" class="form-label">Email or Username</label>
+                  <label for="email" class="form-label">Email</label>
                   <input
-                    type="text"
+                    type="email"
                     class="form-control"
                     id="email"
-                    name="email-username"
-                    placeholder="Enter your email or username"
+                    name="email"
+                    value="{{ old('email') }}"
+                    placeholder="Enter your email"
                     autofocus
                   />
+                  @error('email')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                  @enderror
                 </div>
                 <div class="mb-3 form-password-toggle">
                   <div class="d-flex justify-content-between">
                     <label class="form-label" for="password">Password</label>
-                    <a href="auth-forgot-password-basic.html">
+                    <a href="{{ route('merchant.password.request') }}">
                       <small>Forgot Password?</small>
                     </a>
                   </div>
@@ -100,12 +105,15 @@
                       placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
                       aria-describedby="password"
                     />
-                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+                    <span class="cursor-pointer input-group-text"><i class="bx bx-hide"></i></span>
                   </div>
+                  @error('password')
+                    <div class="text-danger small mt-1">{{ $message }}</div>
+                  @enderror
                 </div>
                 <div class="mb-3">
                   <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="remember-me" />
+                    <input class="form-check-input" type="checkbox" id="remember-me" name="remember" {{ old('remember') ? 'checked' : '' }} />
                     <label class="form-check-label" for="remember-me"> Remember Me </label>
                   </div>
                 </div>
@@ -116,7 +124,7 @@
 
               <p class="text-center">
                 <span>New on our platform?</span>
-                <a href="auth-register-basic.html">
+                <a href="{{ route('merchant.register') }}">
                   <span>Create an account</span>
                 </a>
               </p>
