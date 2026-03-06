@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'merchant.auth' => \App\Http\Middleware\EnsureMerchantAuthenticatedMiddleware::class,
+            'merchant.verified' => \App\Http\Middleware\MerchantEnsureEmailIsVerified::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
