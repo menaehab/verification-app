@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CustomVerificationTokenController;
 use App\Http\Controllers\MerchantAuth\AuthenticatedSessionController;
 use App\Http\Controllers\MerchantAuth\ConfirmablePasswordController;
 use App\Http\Controllers\MerchantAuth\EmailVerificationNotificationController;
@@ -20,7 +21,11 @@ Route::middleware('guest:merchant')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    if (config('verification.way') === 'passwordless') {
+        //
+    } else {
+        Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    }
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');
@@ -36,16 +41,30 @@ Route::middleware('guest:merchant')->group(function () {
 });
 
 Route::middleware('merchant.auth')->group(function () {
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
+    if (config('verification.way') === 'email') {
+        Route::get('verify-email', [EmailVerificationPromptController::class, '__invoke'])
+            ->name('verification.notice');
 
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
+        Route::get('verify-email/{id}/{hash}', [VerifyEmailController::class, '__invoke'])
+            ->middleware(['signed', 'throttle:6,1'])
+            ->name('verification.verify');
 
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
+        Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
+            ->middleware('throttle:6,1')
+            ->name('verification.send');
+    } else if (config('verification.way') === 'cvt') {
+
+        Route::get('verify-email', [CustomVerificationTokenController::class, 'notice'])
+            ->name('verification.notice');
+
+        Route::get('verify-email/{token}', [CustomVerificationTokenController::class, 'verify'])
+            ->middleware(['signed', 'throttle:6,1'])
+            ->name('verification.verify');
+
+        Route::post('email/verification-notification', [CustomVerificationTokenController::class, 'resend'])
+            ->middleware('throttle:6,1')
+            ->name('verification.send');
+    }
 
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');

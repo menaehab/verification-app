@@ -86,9 +86,10 @@
                     autofocus
                   />
                   @error('email')
-                    <div class="text-danger small mt-1">{{ $message }}</div>
+                    <div class="mt-1 text-danger small">{{ $message }}</div>
                   @enderror
                 </div>
+                @if(config('verification.way') === 'passwordless')
                 <div class="mb-3 form-password-toggle">
                   <div class="d-flex justify-content-between">
                     <label class="form-label" for="password">Password</label>
@@ -108,7 +109,7 @@
                     <span class="cursor-pointer input-group-text"><i class="bx bx-hide"></i></span>
                   </div>
                   @error('password')
-                    <div class="text-danger small mt-1">{{ $message }}</div>
+                    <div class="mt-1 text-danger small">{{ $message }}</div>
                   @enderror
                 </div>
                 <div class="mb-3">
@@ -117,6 +118,7 @@
                     <label class="form-check-label" for="remember-me"> Remember Me </label>
                   </div>
                 </div>
+                @else
                 <div class="mb-3">
                   <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                 </div>

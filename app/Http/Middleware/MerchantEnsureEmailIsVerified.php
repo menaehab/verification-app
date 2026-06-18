@@ -24,18 +24,19 @@ class MerchantEnsureEmailIsVerified
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
      * @param  string|null  $redirectToRoute
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse|null
      */
     public function handle($request, Closure $next, $redirectToRoute = null)
     {
-        if (! $request->user('merchant') ||
+        if (config('verification.way') === 'email' || config('verification.way') === 'cvt' ) {
+            if (! $request->user('merchant') ||
             ($request->user('merchant') instanceof MustVerifyEmail &&
             ! $request->user('merchant')->hasVerifiedEmail())) {
-            return $request->expectsJson()
-                ? abort(403, 'Your email address is not verified.')
-                : Redirect::guest(URL::route($redirectToRoute ?: 'merchant.verification.notice'));
+                return $request->expectsJson()
+                    ? abort(403, 'Your email address is not verified.')
+                    : Redirect::guest(URL::route($redirectToRoute ?: 'merchant.verification.notice'));
+            }
         }
 
         return $next($request);

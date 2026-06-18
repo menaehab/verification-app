@@ -50,11 +50,47 @@ class Merchant extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerificationNotification()
     {
-        $url = URL::temporarySignedRoute(
-            'merchant.verification.verify',
-            now()->addMinutes(60),
-            ['id' => $this->getKey(), 'hash' => sha1($this->getEmailForVerification())]
-        );
-        $this->notify(new MerchantEmailVerification($url));
+        if (config('verification.way') === 'email') {
+            $url = URL::temporarySignedRoute(
+                'merchant.verification.verify',
+                now()->addMinutes(60),
+                ['id' => $this->getKey(), 'hash' => sha1($this->getEmailForVerification())]
+            );
+            $this->notify(new MerchantEmailVerification($url));
+        }
+
+        if (config('verification.way') === 'cvt') {
+            $this->generateVerificationToken();
+            $url = URL::temporarySignedRoute(
+                'merchant.verification.verify',
+                now()->addMinutes(60),
+                ['token' => $this->verification_token]
+            );
+            $this->notify(new MerchantEmailVerification($url));
+        }
+    }
+
+
+    public function generateVerificationToken()
+    {
+        if (config('verification.way') === 'cvt') {
+            $token = \Str::random(64);
+            $this->verification_token = $token;
+            $this->save();
+            return $token;
+        }
+    }
+
+    public function verifyUsingVerificationToken($token)
+    {
+        if (config('verification.way') === 'cvt') {
+            if ($this->verification_token === $token && $this->email_verified_at === null) {
+                $this->email_verified_at = now();
+                $this->verification_token = null;
+                $this->save();
+                return true;
+            }
+            return false;
+        }
     }
 }
