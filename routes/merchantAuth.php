@@ -10,6 +10,7 @@ use App\Http\Controllers\MerchantAuth\PasswordController;
 use App\Http\Controllers\MerchantAuth\PasswordResetLinkController;
 use App\Http\Controllers\MerchantAuth\RegisteredUserController;
 use App\Http\Controllers\MerchantAuth\VerifyEmailController;
+use App\Http\Controllers\PasswordlessAuthController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest:merchant')->group(function () {
@@ -22,7 +23,9 @@ Route::middleware('guest:merchant')->group(function () {
         ->name('login');
 
     if (config('verification.way') === 'passwordless') {
-        //
+        Route::post('login', [PasswordlessAuthController::class, 'store']);
+
+        Route::get('verify-email/{merchant}', [PasswordController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verify.email');
     } else {
         Route::post('login', [AuthenticatedSessionController::class, 'store']);
     }
@@ -52,7 +55,7 @@ Route::middleware('merchant.auth')->group(function () {
         Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
             ->middleware('throttle:6,1')
             ->name('verification.send');
-    } else if (config('verification.way') === 'cvt') {
+    } elseif (config('verification.way') === 'cvt') {
 
         Route::get('verify-email', [CustomVerificationTokenController::class, 'notice'])
             ->name('verification.notice');
