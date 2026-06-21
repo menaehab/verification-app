@@ -48,6 +48,30 @@ class Merchant extends Authenticatable implements MustVerifyEmail
         ];
     }
 
+    public function generateOTP()
+    {
+        if (config('verification.way') === 'otp') {
+            $otp = rand(100000, 999999);
+            $this->otp = $otp;
+            $this->otp_till = now()->addMinutes(10);
+            $this->save();
+            return $otp;
+        }
+    }
+
+    public function verifyOTP($otp)
+    {
+        if (config('verification.way') === 'otp') {
+            if ($this->otp === $otp && $this->otp_till > now()) {
+                $this->otp = null;
+                $this->otp_till = null;
+                $this->save();
+                return true;
+            }
+            return false;
+        }
+    }
+
     public function sendEmailVerificationNotification()
     {
         if (config('verification.way') === 'email') {

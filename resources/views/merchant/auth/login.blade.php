@@ -89,7 +89,7 @@
                     <div class="mt-1 text-danger small">{{ $message }}</div>
                   @enderror
                 </div>
-                @if(config('verification.way') === 'passwordless')
+                @if(config('verification.way') === 'passwordless' || config('verification.way') === 'otp')
                 <div class="mb-3 form-password-toggle">
                   <div class="d-flex justify-content-between">
                     <label class="form-label" for="password">Password</label>

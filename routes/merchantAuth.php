@@ -10,6 +10,7 @@ use App\Http\Controllers\MerchantAuth\PasswordController;
 use App\Http\Controllers\MerchantAuth\PasswordResetLinkController;
 use App\Http\Controllers\MerchantAuth\RegisteredUserController;
 use App\Http\Controllers\MerchantAuth\VerifyEmailController;
+use App\Http\Controllers\OTPController;
 use App\Http\Controllers\PasswordlessAuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,10 @@ Route::middleware('guest:merchant')->group(function () {
         Route::post('login', [PasswordlessAuthController::class, 'store']);
 
         Route::get('verify-email/{merchant}', [PasswordController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verify.email');
+    } elseif (config('verification.way') === 'otp') {
+        Route::post('login', [OTPController::class, 'store']);
+
+        Route::get('verify-email/{merchant}', [OTPController::class, 'verify'])->middleware(['signed', 'throttle:6,1'])->name('verify.email');
     } else {
         Route::post('login', [AuthenticatedSessionController::class, 'store']);
     }
