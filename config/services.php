@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'recaptcha' => [
+        'client_key' => env('RECAPTCHA_CLIENT_KEY'),
+        'server_key' => env('RECAPTCHA_SERVER_KEY'),
+    ],
+
 ];

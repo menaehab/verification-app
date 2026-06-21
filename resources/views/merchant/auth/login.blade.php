@@ -89,7 +89,7 @@
                     <div class="mt-1 text-danger small">{{ $message }}</div>
                   @enderror
                 </div>
-                @if(config('verification.way') === 'passwordless' || config('verification.way') === 'otp')
+                @if(config('verification.way') !== 'passwordless' && config('verification.way') !== 'otp')
                 <div class="mb-3 form-password-toggle">
                   <div class="d-flex justify-content-between">
                     <label class="form-label" for="password">Password</label>
@@ -119,6 +119,13 @@
                   </div>
                 </div>
                 @else
+                @endif
+                 <div class="mb-3">
+                    <div class="g-recaptcha" data-sitekey="{{ config('services.recaptcha.client_key') }}"></div>
+                    @error('g-recaptcha-response')
+                        <div class="mt-1 text-danger small">{{ $message }}</div>
+                    @enderror
+                </div>
                 <div class="mb-3">
                   <button class="btn btn-primary d-grid w-100" type="submit">Sign in</button>
                 </div>

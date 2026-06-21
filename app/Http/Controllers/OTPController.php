@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Merchant;
+use App\Services\TwilloService;
 use Illuminate\Http\Request;
 
 class OTPController extends Controller
@@ -20,6 +21,10 @@ class OTPController extends Controller
         }
 
         $otp = $merchant->generateOTP();
+        $merchant->phone = $request->phone;
+        $merchant->save();
+
+        TwilloService::sendOTP($request->phone, $otp);
 
         return back()->with('success', 'OTP sent successfully');
     }
